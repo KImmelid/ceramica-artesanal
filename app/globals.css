@@ -1,0 +1,23 @@
+@import "tailwindcss";
+@reference "tailwindcss";
+
+/* Tokens simples */
+:root {
+  --bg: #FAFAFA;
+  --border: #E4E4E7;
+  --terracotta: #C4623E;
+}
+html, body { background: var(--bg); color:#101010; }
+
+/* Utilidades que usan @apply (v4 requiere @reference arriba) */
+.container { @apply mx-auto max-w-[1280px] px-4; }
+.section   { @apply py-16; }
+.card      { @apply border rounded-xl p-4 bg-white; }
+.card      { box-shadow: 0 8px 24px rgba(0,0,0,.03); border-color: var(--border); }
+.btn       { @apply inline-flex items-center justify-center px-5 py-3 rounded-lg; }
+.btn-primary { @apply text-white; }
+.btn-primary { background: var(--terracotta); }
+.btn-outline { @apply border; }
+.btn-outline { border-color: var(--border); }
+.hr        { @apply my-12 border-t; }
+.hr        { border-color: var(--border); }
