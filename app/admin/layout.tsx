@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 import authConfig from "@/auth.config";
+import { ToastProvider } from "./componentes/ToastProvider";
 
 const MENU = [
   { href: "/admin", label: "Dashboard" },
@@ -16,6 +17,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
 
   return (
     <div className="min-h-screen flex bg-[#FAFAFA]">
+      <ToastProvider />
       {/* Sidebar */}
       <aside className="w-60 shrink-0 border-r bg-white">
         <div className="px-5 py-4 border-b">

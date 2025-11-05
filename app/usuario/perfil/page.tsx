@@ -19,7 +19,7 @@ export default async function UsuarioPerfilPage() {
         <div>
           <label className="text-sm text-gray-500">Rol</label>
           <p className="inline-flex px-2 py-1 bg-gray-100 rounded-lg text-xs">
-            {(session?.user as any)?.role ?? "USER"}
+            {session?.user?.role ?? "USER"}
           </p>
         </div>
       </div>

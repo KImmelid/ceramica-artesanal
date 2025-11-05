@@ -19,6 +19,7 @@ export default async function UsuarioLayout({ children }: { children: ReactNode 
         <div className="px-5 py-5 border-b">
           <p className="text-xs text-gray-500">Área del usuario</p>
           <h2 className="text-lg font-serif">Cerámica Artesanal</h2>
+          <p className="mt-2 text-sm text-gray-600">{session?.user?.name ?? "Usuario"}</p>
         </div>
         <nav className="p-4 space-y-1 text-sm">
           {MENU.map((item) => (
