@@ -1,34 +1,16 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import bcrypt from "bcryptjs";
 
-export async function POST(req: Request) {
+export const runtime = "nodejs";
+
+export async function GET() {
   try {
-    const { name, email, password } = await req.json();
-
-    if (!name || !email || !password) {
-      return NextResponse.json({ ok: false, error: "Faltan campos" }, { status: 400 });
-    }
-
-    const exists = await prisma.user.findUnique({ where: { email } });
-    if (exists) {
-      return NextResponse.json({ ok: false, error: "Email ya registrado" }, { status: 409 });
-    }
-
-    const hashed = await bcrypt.hash(password, 10);
-
-    await prisma.user.create({
-      data: {
-        name,
-        email,
-        password: hashed,
-        // Opcional: primer usuario ADMIN
-        // role: "ADMIN",
-      },
-    });
-
-    return NextResponse.json({ ok: true });
-  } catch (err) {
-    return NextResponse.json({ ok: false, error: String(err) }, { status: 500 });
+    await prisma.user.count();
+    return NextResponse.json({ ok: true, db: "up" });
+  } catch (e) {
+    return NextResponse.json(
+      { ok: false, db: "down", error: String(e) },
+      { status: 500 }
+    );
   }
 }
