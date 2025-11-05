@@ -1,88 +1,44 @@
-"use client";
+import FiltersBar from "../componentes/FiltersBar";
+import Pagination from "../componentes/Pagination";
+import Table from "../componentes/Table";
 
-import { useEffect, useState } from "react";
-import { Toaster, toast } from "sonner";
-import EditModal from "./EditModal";
+async function fetchProductos(searchParams: Record<string, string | undefined>) {
+  const sp = new URLSearchParams();
+  ["q", "sort", "page", "perPage"].forEach((k) => {
+    const v = searchParams[k];
+    if (typeof v === "string") sp.set(k, v);
+  });
 
-type Product = { id: number; name: string; price: number; stock: number; createdAt: string };
+  const base = process.env.NEXT_PUBLIC_BASE_URL ?? "";
+  const res = await fetch(`${base}/api/productos?` + sp.toString(), { cache: "no-store" });
+  if (!res.ok) throw new Error("No se pudieron cargar productos");
+  return res.json() as Promise<{ meta: { page: number; pages: number }; rows: any[] }>;
+}
 
-export default function AdminProductosPage() {
-  const [items, setItems] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [editing, setEditing] = useState<Product | null>(null);
-
-  async function load() {
-    setLoading(true);
-    const res = await fetch("/api/productos");
-    setItems(await res.json());
-    setLoading(false);
-  }
-
-  useEffect(() => { load(); }, []);
-
-  async function eliminar(id: number) {
-    if (!confirm("¿Eliminar producto?")) return;
-    const res = await fetch(`/api/productos/${id}`, { method: "DELETE" });
-    if (res.ok) {
-      toast.success("Producto eliminado");
-      await load();
-    }
-  }
+export default async function AdminProductosPage({ searchParams }: { searchParams: Record<string, string | undefined> }) {
+  const data = await fetchProductos(searchParams);
+  const columns = [
+    { key: "name", header: "Nombre" },
+    { key: "price", header: "Precio", render: (p: any) => `$${p.price}` },
+    { key: "stock", header: "Stock" },
+    { key: "createdAt", header: "Creado", render: (p: any) => new Date(p.createdAt).toLocaleDateString() },
+  ];
 
   return (
-    <div className="space-y-6">
-      <Toaster position="top-right" />
+    <div className="space-y-4">
       <h1 className="text-2xl font-serif">Productos</h1>
-
-      <div className="rounded-2xl border bg-white overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-4 py-2 text-left">Nombre</th>
-              <th className="px-4 py-2 text-left">Precio</th>
-              <th className="px-4 py-2 text-left">Stock</th>
-              <th className="px-4 py-2 text-left">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr><td colSpan={4} className="px-4 py-3 text-gray-500">Cargando...</td></tr>
-            ) : items.length === 0 ? (
-              <tr><td colSpan={4} className="px-4 py-3 text-gray-500">Sin productos</td></tr>
-            ) : (
-              items.map((p) => (
-                <tr key={p.id} className="border-t">
-                  <td className="px-4 py-2">{p.name}</td>
-                  <td className="px-4 py-2">${p.price}</td>
-                  <td className="px-4 py-2">{p.stock}</td>
-                  <td className="px-4 py-2 flex gap-3">
-                    <button
-                      onClick={() => setEditing(p)}
-                      className="text-sm underline text-blue-600"
-                    >
-                      Editar
-                    </button>
-                    <button
-                      onClick={() => eliminar(p.id)}
-                      className="text-sm underline text-red-600"
-                    >
-                      Eliminar
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+      <FiltersBar placeholders={{ q: "Buscar por nombre o id..." }} />
+      <div className="flex items-center gap-2 text-sm">
+        <a href="?sort=date_desc" className="underline">Fecha ↓</a>
+        <a href="?sort=date_asc" className="underline">Fecha ↑</a>
+        <a href="?sort=price_desc" className="underline">Precio ↓</a>
+        <a href="?sort=price_asc" className="underline">Precio ↑</a>
+        <a href="?sort=stock_desc" className="underline">Stock ↓</a>
+        <a href="?sort=stock_asc" className="underline">Stock ↑</a>
       </div>
-
-      {editing && (
-        <EditModal
-          product={editing}
-          onClose={() => setEditing(null)}
-          onUpdated={load}
-        />
-      )}
+      <Table columns={columns as any} rows={data.rows} />
+      <Pagination page={data.meta.page} pages={data.meta.pages} />
     </div>
   );
 }
+

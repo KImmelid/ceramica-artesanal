@@ -1,44 +1,42 @@
-import { prisma } from "@/lib/db";
+import FiltersBar from "../componentes/FiltersBar";
+import Pagination from "../componentes/Pagination";
+import Table from "../componentes/Table";
 
-export default async function AdminClientesPage() {
-  const clientes = await prisma.user.findMany({
-    orderBy: { createdAt: "desc" },
+async function fetchClientes(searchParams: Record<string, string | undefined>) {
+  const sp = new URLSearchParams();
+  ["q", "sort", "page", "perPage"].forEach((k) => {
+    const v = searchParams[k];
+    if (typeof v === "string") sp.set(k, v);
   });
 
+  const base = process.env.NEXT_PUBLIC_BASE_URL ?? "";
+  const res = await fetch(`${base}/api/clientes?` + sp.toString(), { cache: "no-store" });
+  if (!res.ok) throw new Error("No se pudieron cargar clientes");
+  return res.json() as Promise<{ meta: { page: number; pages: number }; rows: any[] }>;
+}
+
+export default async function AdminClientesPage({ searchParams }: { searchParams: Record<string, string | undefined> }) {
+  const data = await fetchClientes(searchParams);
+  const columns = [
+    { key: "name", header: "Nombre", render: (c: any) => c.name ?? "—" },
+    { key: "email", header: "Email", render: (c: any) => c.email ?? "—" },
+    { key: "role", header: "Rol" },
+    { key: "createdAt", header: "Registrado", render: (c: any) => new Date(c.createdAt).toLocaleDateString() },
+  ];
+
   return (
-    <div>
-      <h1 className="text-xl font-serif mb-4">Clientes</h1>
-      <div className="rounded-2xl border bg-white overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="text-left px-4 py-2">Nombre</th>
-              <th className="text-left px-4 py-2">Email</th>
-              <th className="text-left px-4 py-2">Rol</th>
-              <th className="text-left px-4 py-2">Registrado</th>
-            </tr>
-          </thead>
-          <tbody>
-            {clientes.map((c) => (
-              <tr key={c.id} className="border-t">
-                <td className="px-4 py-2">{c.name}</td>
-                <td className="px-4 py-2">{c.email}</td>
-                <td className="px-4 py-2">{c.role}</td>
-                <td className="px-4 py-2">
-                  {new Date(c.createdAt).toLocaleDateString()}
-                </td>
-              </tr>
-            ))}
-            {clientes.length === 0 && (
-              <tr>
-                <td colSpan={4} className="px-4 py-3 text-gray-500">
-                  No hay clientes registrados.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+    <div className="space-y-4">
+      <h1 className="text-2xl font-serif">Clientes</h1>
+      <FiltersBar placeholders={{ q: "Buscar por nombre, email o id..." }} />
+      <div className="flex items-center gap-2 text-sm">
+        <a href="?sort=date_desc" className="underline">Fecha ↓</a>
+        <a href="?sort=date_asc" className="underline">Fecha ↑</a>
+        <a href="?sort=name_asc" className="underline">Nombre A-Z</a>
+        <a href="?sort=name_desc" className="underline">Nombre Z-A</a>
       </div>
+      <Table columns={columns as any} rows={data.rows} />
+      <Pagination page={data.meta.page} pages={data.meta.pages} />
     </div>
   );
 }
+
