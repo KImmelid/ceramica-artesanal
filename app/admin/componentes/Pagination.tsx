@@ -26,11 +26,15 @@ export default function Pagination({ page, pages, perPage, total, onPageChange }
   }
 
   return (
-    <div className="flex items-center justify-between text-sm px-2 py-3">
-      <span>Página {current} de {totalPages}</span>
+    <div className="flex flex-wrap items-center justify-between text-sm px-4 py-3 rounded-2xl border bg-white/90">
+      <span>Pagina {current} de {totalPages}</span>
       <div className="flex gap-2">
-        <button disabled={current <= 1} onClick={() => go(current - 1)} className="border rounded px-2 py-1 disabled:opacity-50">Anterior</button>
-        <button disabled={current >= totalPages} onClick={() => go(current + 1)} className="border rounded px-2 py-1 disabled:opacity-50">Siguiente</button>
+        <button disabled={current <= 1} onClick={() => go(current - 1)} className="btn btn-outline px-3 py-1 disabled:opacity-40">
+          Anterior
+        </button>
+        <button disabled={current >= totalPages} onClick={() => go(current + 1)} className="btn btn-outline px-3 py-1 disabled:opacity-40">
+          Siguiente
+        </button>
       </div>
     </div>
   );

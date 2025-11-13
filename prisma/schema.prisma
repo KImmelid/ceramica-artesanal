@@ -43,6 +43,7 @@ model Workshop {
   date         DateTime
   capacity     Int
   enrollments  WorkshopEnrollment[]
+  open         Boolean  @default(true)
 }
 
 model WorkshopEnrollment {

@@ -39,18 +39,17 @@ export default function EditModal({ open, initial, onClose, onSaved }: Props) {
       <div className="absolute inset-0 bg-black/30" onClick={onClose} />
       <div className="relative z-10 w-full max-w-lg rounded-xl bg-white border shadow p-4 space-y-3">
         <h2 className="text-lg font-semibold">Editar taller</h2>
-        <input className="border p-2 rounded w-full" value={form.title} onChange={(e)=>setForm({...form, title:e.target.value})} />
-        <input className="border p-2 rounded w-full" value={form.description} onChange={(e)=>setForm({...form, description:e.target.value})} />
+        <input className="input w-full" value={form.title} onChange={(e)=>setForm({...form, title:e.target.value})} />
+        <input className="input w-full" value={form.description} onChange={(e)=>setForm({...form, description:e.target.value})} />
         <div className="grid grid-cols-2 gap-2">
-          <input className="border p-2 rounded" type="datetime-local" value={form.date} onChange={(e)=>setForm({...form, date:e.target.value})} />
-          <input className="border p-2 rounded" type="number" value={form.capacity} onChange={(e)=>setForm({...form, capacity:Number(e.target.value)})} />
+          <input className="input" type="datetime-local" value={form.date} onChange={(e)=>setForm({...form, date:e.target.value})} />
+          <input className="input" type="number" value={form.capacity} onChange={(e)=>setForm({...form, capacity:Number(e.target.value)})} />
         </div>
         <div className="flex justify-end gap-2">
-          <button onClick={onClose} className="px-3 py-1.5 rounded border">Cancelar</button>
-          <button onClick={save} disabled={saving} className="px-3 py-1.5 rounded text-white" style={{ background: "#C4623E" }}>Guardar</button>
+          <button onClick={onClose} className="btn btn-outline px-3 py-1.5">Cancelar</button>
+          <button onClick={save} disabled={saving} className="btn btn-primary px-3 py-1.5">{saving ? "Guardando..." : "Guardar"}</button>
         </div>
       </div>
     </div>
   );
 }
-

@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { auth } from "@/auth";
+import { validateProduct } from "@/lib/validate";
 
-type Ctx = { params: Promise<{ id: string }> };
+type Ctx = { params: { id: string } };
 
 export const runtime = "nodejs";
 
@@ -11,13 +12,16 @@ export async function PATCH(req: Request, ctx: Ctx) {
   if (session?.user?.role !== "ADMIN") {
     return NextResponse.json({ error: "No autorizado" }, { status: 403 });
   }
-  const { id: idStr } = await ctx.params;
-  const id = Number(idStr);
+  const id = Number(ctx.params.id);
   if (!Number.isFinite(id)) {
-    return NextResponse.json({ error: "ID inválido" }, { status: 400 });
+    return NextResponse.json({ error: "ID invalido" }, { status: 400 });
   }
-  const data = await req.json(); // { name?, price?, stock?, image? }
-  const upd = await prisma.product.update({ where: { id }, data });
+  const payload = await req.json();
+  const result = validateProduct(payload, { partial: true });
+  if (!result.ok) {
+    return NextResponse.json({ error: "Validacion", details: result.errors }, { status: 400 });
+  }
+  const upd = await prisma.product.update({ where: { id }, data: result.data });
   return NextResponse.json(upd);
 }
 
@@ -26,10 +30,9 @@ export async function DELETE(_req: Request, ctx: Ctx) {
   if (session?.user?.role !== "ADMIN") {
     return NextResponse.json({ error: "No autorizado" }, { status: 403 });
   }
-  const { id: idStr } = await ctx.params;
-  const id = Number(idStr);
+  const id = Number(ctx.params.id);
   if (!Number.isFinite(id)) {
-    return NextResponse.json({ error: "ID inválido" }, { status: 400 });
+    return NextResponse.json({ error: "ID invalido" }, { status: 400 });
   }
   await prisma.product.delete({ where: { id } });
   return NextResponse.json({ ok: true });

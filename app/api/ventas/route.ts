@@ -21,14 +21,14 @@ export async function GET(req: Request) {
   const dateFrom = dateFromStr ? new Date(dateFromStr) : undefined;
   const dateTo = dateToStr ? new Date(dateToStr) : undefined;
 
-  const and: any[] = [];
+  const and: Prisma.OrderWhereInput[] = [];
   if (q) {
     const maybeId = Number(q);
     and.push({
       OR: [
         { user: { is: { name: { contains: q, mode: "insensitive" } } } },
         { user: { is: { email: { contains: q, mode: "insensitive" } } } },
-        ...(Number.isFinite(maybeId) ? [{ id: maybeId }] as any[] : []),
+        ...(Number.isFinite(maybeId) ? [{ id: maybeId }] : []),
       ],
     });
   }
@@ -40,7 +40,7 @@ export async function GET(req: Request) {
       },
     });
   }
-  const where = and.length ? { AND: and } : {};
+  const where: Prisma.OrderWhereInput = and.length ? { AND: and } : {};
 
   const total = await prisma.order.count({ where });
   const { skip, take } = prismaSkipTake(page, perPage);

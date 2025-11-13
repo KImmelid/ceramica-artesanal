@@ -20,12 +20,15 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  const SECRET = process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET;
+  const token = await getToken({ req, secret: SECRET });
   const isLogged = !!token;
+
+  const needsAuth = pathname.startsWith("/usuario");
   const isAdminRoute = pathname.startsWith("/admin");
 
-  // No logueado: redirige a login con callback
-  if (!isLogged && !isAuthPage) {
+  // Proteger sólo /usuario/* para usuarios autenticados
+  if (needsAuth && !isLogged) {
     const url = new URL("/login", nextUrl.origin);
     url.searchParams.set("callbackUrl", pathname);
     return NextResponse.redirect(url);
@@ -36,9 +39,16 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL("/", nextUrl.origin));
   }
 
-  // Rutas admin: exige role ADMIN
-  if (isAdminRoute && token?.role !== "ADMIN") {
-    return NextResponse.redirect(new URL("/", nextUrl.origin));
+  // Rutas admin: deben estar autenticadas y con rol ADMIN
+  if (isAdminRoute) {
+    if (!isLogged) {
+      const url = new URL("/login", nextUrl.origin);
+      url.searchParams.set("callbackUrl", pathname);
+      return NextResponse.redirect(url);
+    }
+    if (token?.role !== "ADMIN") {
+      return NextResponse.redirect(new URL("/", nextUrl.origin));
+    }
   }
 
   return NextResponse.next();
@@ -50,4 +60,3 @@ export const config = {
     "/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)",
   ],
 };
-

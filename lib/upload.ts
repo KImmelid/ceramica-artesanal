@@ -10,8 +10,8 @@ export type ProcessImageOptions = {
 };
 
 // Placeholder helpers for future implementation
-export async function processImage(_file: File, _opts?: ProcessImageOptions): Promise<ImageInfo> {
-  // TODO: implementar procesamiento/subida real (local/S3/etc.)
+export async function processImage(file: File, opts?: ProcessImageOptions): Promise<ImageInfo> {
+  void file;
+  void opts;
   throw new Error("processImage no implementado");
 }
-

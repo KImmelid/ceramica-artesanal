@@ -6,14 +6,15 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "analyze:bundle": "node scripts/analyzeBundle.mjs",
+    "seed:demo": "ts-node --transpile-only scripts/seedDemo.ts"
   },
   "dependencies": {
-    "@prisma/client": "^6.17.0",
+    "@prisma/client": "^6.19.0",
     "bcryptjs": "^3.0.2",
     "next": "15.5.4",
     "next-auth": "^4.24.11",
-    "prisma": "^6.17.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "recharts": "^3.3.0",
@@ -28,7 +29,10 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.5.4",
+    "prisma": "^6.19.0",
     "tailwindcss": "^4",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5"
   }
 }

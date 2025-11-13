@@ -1,10 +1,12 @@
-// auth.config.ts
+﻿// auth.config.ts
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/db";
 import bcrypt from "bcryptjs";
 import type { NextAuthOptions } from "next-auth";
+import type { JWT } from "next-auth/jwt";
+import type { AdapterUser } from "next-auth/adapters";
 
-// 👇 no tipamos con NextAuthConfig porque tu versión no lo exporta
+// ðŸ‘‡ no tipamos con NextAuthConfig porque tu versiÃ³n no lo exporta
 const authConfig: NextAuthOptions = {
   session: {
     strategy: "jwt",
@@ -14,7 +16,7 @@ const authConfig: NextAuthOptions = {
       name: "credentials",
       credentials: {
         email: { label: "Email", type: "text" },
-        password: { label: "Contraseña", type: "password" },
+        password: { label: "ContraseÃ±a", type: "password" },
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
@@ -51,15 +53,16 @@ const authConfig: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        (token as any).role = (user as any).role || "USER";
-        (token as any).uid = (user as any).id;
+        const u = user as AdapterUser & { role?: string | null };
+        token.role = u.role ?? "USER";
+        token.uid = u.id ?? token.uid;
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
-        (session.user as any).role = (token as any).role;
-        (session.user as any).id = (token as any).uid;
+        session.user.role = (token as JWT).role || "USER";
+        session.user.id = (token as JWT).uid;
       }
       return session;
     },
@@ -68,3 +71,4 @@ const authConfig: NextAuthOptions = {
 };
 
 export default authConfig;
+

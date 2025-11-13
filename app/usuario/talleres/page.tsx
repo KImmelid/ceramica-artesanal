@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db";
+import CancelarButton from "@/app/usuario/talleres/CancelarButton";
 import { getServerSession } from "next-auth";
 import authConfig from "@/auth.config";
 
@@ -27,6 +28,9 @@ export default async function UsuarioTalleresPage() {
                 {new Date(t.workshop.date).toLocaleString()}
               </p>
               <p className="text-sm mt-2">{t.workshop.description}</p>
+              <div className="mt-3">
+                <CancelarButton id={t.workshopId} />
+              </div>
             </div>
           ))
         )}

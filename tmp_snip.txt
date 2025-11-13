@@ -1,0 +1,9 @@
+      <form onSubmit={crear} className="grid grid-cols-1 md:grid-cols-5 gap-2 max-w-5xl">
+        <input
+          className="border p-2 rounded"
+          placeholder="Título"
+          value={form.title}
+          onChange={(e) => setForm({ ...form, title: e.target.value })}
+        />
+        <input
+          className="border p-2 rounded"
