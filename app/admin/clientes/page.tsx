@@ -13,7 +13,7 @@ const firstValue = (value: string | string[] | undefined) => {
   return value ?? null;
 };
 
-export default async function AdminClientesPage({ searchParams }: { searchParams?: AdminSearchParams | Promise<AdminSearchParams> }) {
+export default async function AdminClientesPage({ searchParams }: { searchParams?: Promise<AdminSearchParams> }) {
   const resolved = (await searchParams) ?? {};
   const q = qpString(firstValue(resolved.q));
   const sort = qpEnum(firstValue(resolved.sort), ["date_desc", "date_asc", "name_asc", "name_desc"], "date_desc");

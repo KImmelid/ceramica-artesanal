@@ -12,7 +12,7 @@ const firstValue = (value: string | string[] | undefined) => {
 
 export const runtime = "nodejs";
 
-export default async function VentasPage({ searchParams }: { searchParams?: AdminSearchParams | Promise<AdminSearchParams> }) {
+export default async function VentasPage({ searchParams }: { searchParams?: Promise<AdminSearchParams> }) {
   const resolved = (await searchParams) ?? {};
   const q = qpString(firstValue(resolved.q));
   const sort = qpEnum(firstValue(resolved.sort), ["date_desc", "date_asc", "total_desc", "total_asc", "id_desc", "id_asc"], "date_desc");
