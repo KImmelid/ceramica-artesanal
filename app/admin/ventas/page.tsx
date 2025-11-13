@@ -4,17 +4,22 @@ import { qpNumber, qpString, qpEnum } from "@/lib/qs";
 import { pageInfo, prismaSkipTake } from "@/lib/paginate";
 import { Prisma } from "@prisma/client";
 
-type SearchParams = { [k: string]: string | string[] | undefined };
+type AdminSearchParams = Record<string, string | string[] | undefined>;
+const firstValue = (value: string | string[] | undefined) => {
+  if (Array.isArray(value)) return value[0] ?? null;
+  return value ?? null;
+};
 
 export const runtime = "nodejs";
 
-export default async function VentasPage({ searchParams }: { searchParams: SearchParams }) {
-  const q = qpString((searchParams.q as string) || null);
-  const sort = qpEnum((searchParams.sort as string) || null, ["date_desc", "date_asc", "total_desc", "total_asc", "id_desc", "id_asc"], "date_desc");
-  const page = Math.max(1, qpNumber((searchParams.page as string) || null, 1));
-  const perPage = Math.min(50, Math.max(5, qpNumber((searchParams.perPage as string) || null, 20)));
-  const dateFromStr = qpString((searchParams.dateFrom as string) || null, "");
-  const dateToStr = qpString((searchParams.dateTo as string) || null, "");
+export default async function VentasPage({ searchParams }: { searchParams?: AdminSearchParams | Promise<AdminSearchParams> }) {
+  const resolved = (await searchParams) ?? {};
+  const q = qpString(firstValue(resolved.q));
+  const sort = qpEnum(firstValue(resolved.sort), ["date_desc", "date_asc", "total_desc", "total_asc", "id_desc", "id_asc"], "date_desc");
+  const page = Math.max(1, qpNumber(firstValue(resolved.page), 1));
+  const perPage = Math.min(50, Math.max(5, qpNumber(firstValue(resolved.perPage), 20)));
+  const dateFromStr = qpString(firstValue(resolved.dateFrom), "");
+  const dateToStr = qpString(firstValue(resolved.dateTo), "");
   const dateFrom = dateFromStr ? new Date(dateFromStr) : undefined;
   const dateTo = dateToStr ? new Date(dateToStr) : undefined;
 

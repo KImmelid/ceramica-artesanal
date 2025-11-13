@@ -6,11 +6,19 @@ import { Prisma } from "@prisma/client";
 
 export const runtime = "nodejs";
 
-export default async function AdminClientesPage({ searchParams }: { searchParams: Record<string, string | undefined> }) {
-  const q = qpString(searchParams.q || null);
-  const sort = qpEnum(searchParams.sort || null, ["date_desc", "date_asc", "name_asc", "name_desc"], "date_desc");
-  const page = Math.max(1, qpNumber(searchParams.page || null, 1));
-  const perPage = Math.min(50, Math.max(5, qpNumber(searchParams.perPage || null, 20)));
+type AdminSearchParams = Record<string, string | string[] | undefined>;
+
+const firstValue = (value: string | string[] | undefined) => {
+  if (Array.isArray(value)) return value[0] ?? null;
+  return value ?? null;
+};
+
+export default async function AdminClientesPage({ searchParams }: { searchParams?: AdminSearchParams | Promise<AdminSearchParams> }) {
+  const resolved = (await searchParams) ?? {};
+  const q = qpString(firstValue(resolved.q));
+  const sort = qpEnum(firstValue(resolved.sort), ["date_desc", "date_asc", "name_asc", "name_desc"], "date_desc");
+  const page = Math.max(1, qpNumber(firstValue(resolved.page), 1));
+  const perPage = Math.min(50, Math.max(5, qpNumber(firstValue(resolved.perPage), 20)));
 
   let where: Prisma.UserWhereInput = {};
   if (q) {
