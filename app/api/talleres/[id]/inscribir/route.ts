@@ -1,18 +1,16 @@
-import { NextResponse, type RouteHandlerContext } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { auth } from "@/auth";
 
-type RouteParams = { id: string };
-
 export const runtime = "nodejs";
 
-export async function POST(_req: Request, ctx: RouteHandlerContext<RouteParams>) {
+export async function POST(_req: Request, { params }: { params: { id: string } }) {
   const session = await auth();
   if (!session || !session.user) {
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
   }
 
-  const workshopId = Number(ctx.params.id);
+  const workshopId = Number(params.id);
   if (!Number.isFinite(workshopId)) {
     return NextResponse.json({ error: "ID invalido" }, { status: 400 });
   }
@@ -47,13 +45,13 @@ export async function POST(_req: Request, ctx: RouteHandlerContext<RouteParams>)
   return NextResponse.json(enrollment, { status: 201 });
 }
 
-export async function DELETE(_req: Request, ctx: RouteHandlerContext<RouteParams>) {
+export async function DELETE(_req: Request, { params }: { params: { id: string } }) {
   const session = await auth();
   if (!session || !session.user) {
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
   }
 
-  const workshopId = Number(ctx.params.id);
+  const workshopId = Number(params.id);
   if (!Number.isFinite(workshopId)) {
     return NextResponse.json({ error: "ID invalido" }, { status: 400 });
   }
