@@ -5,10 +5,10 @@ import { auth } from "@/auth";
 export const runtime = "nodejs";
 
 type WorkshopPayload = {
-  title?: string;
+  title: string;
   description?: string;
-  date?: string;
-  capacity?: number;
+  date: string;
+  capacity: number;
 };
 
 function validateWorkshopInput(raw: unknown): WorkshopPayload | null {
