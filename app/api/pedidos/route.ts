@@ -20,6 +20,10 @@ export async function GET() {
 export async function POST(req: Request) {
   const session = await auth();
   if (!session || !session.user) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+  const userId = Number(session.user.id);
+  if (!Number.isFinite(userId)) {
+    return NextResponse.json({ error: "Usuario invalido" }, { status: 400 });
+  }
 
   try {
     const body = await req.json();
@@ -60,7 +64,7 @@ export async function POST(req: Request) {
         data: {
           total: Number(total),
           status,
-          userId: Number(session.user.id),
+          userId,
         },
       });
       return order;
