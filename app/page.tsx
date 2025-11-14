@@ -223,6 +223,5 @@ export default async function Page() {
 }
 
 function HomeWorkshopsWrapper() {
-  // @ts-expect-error Async Server Component
   return <HomeWorkshops />;
 }
