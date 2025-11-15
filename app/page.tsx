@@ -162,7 +162,7 @@ export default async function Page() {
             style={{ borderColor: "rgba(222, 214, 206, 0.6)" }}
           >
             <Image
-              src="/images/nosotros/nosotros.png"
+              src="/images/nosotros/Nosotros.png"
               alt="Detalle del taller y piezas recien esmaltadas"
               fill
               sizes="(min-width: 1024px) 360px, 100vw"
